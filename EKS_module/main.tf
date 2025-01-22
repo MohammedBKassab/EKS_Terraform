@@ -18,7 +18,7 @@ resource "local_file" "private_key" {
 
 
 resource "aws_eks_cluster" "eks_cluster" {
-  name     = "devopsshack-cluster"
+  name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
@@ -28,8 +28,8 @@ resource "aws_eks_cluster" "eks_cluster" {
 }
 
 resource "aws_eks_node_group" "eks_node_grp" {
-  cluster_name    = aws_eks_cluster.devopsshack.name
-  node_group_name = "devopsshack-node-group"
+  cluster_name    = aws_eks_cluster.eks_cluster.name
+  node_group_name = var.nodes_name[count.index]
   node_role_arn   = aws_iam_role.eks_node_group_role.arn
   subnet_ids      = aws_subnet.eks_subnet[*].id
 
@@ -39,7 +39,7 @@ resource "aws_eks_node_group" "eks_node_grp" {
     min_size     = 2
   }
 
-  instance_types = ["t2.medium"]
+  instance_types = [var.instance_types]
 
   remote_access {
     ec2_ssh_key = var.eks_key_name
@@ -47,8 +47,8 @@ resource "aws_eks_node_group" "eks_node_grp" {
   }
 }
 
-resource "aws_iam_role" "cluster_role" {
-  name = "devopsshack-cluster-role"
+resource "aws_iam_role" "eks_cluster_role" {
+  name = "eks-cluster-role"
 
   assume_role_policy = <<EOF
 {
@@ -67,7 +67,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_role_policy" {
-  role       = aws_iam_role.devopsshack_cluster_role.name
+  role       = aws_iam_role.cluster_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
@@ -90,7 +90,7 @@ resource "aws_iam_role" "eks_node_group_role" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "devopsshack_node_group_role_policy" {
+resource "aws_iam_role_policy_attachment" "node_group_role_policy" {
   role       = aws_iam_role.eks_node_group_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
