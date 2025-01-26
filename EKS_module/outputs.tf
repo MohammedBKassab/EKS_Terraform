@@ -16,7 +16,7 @@ output "cluster_endpoint" {
 
 output "node_group_ip" {
     description = "list of node group ip"
-    value = aws_eks_node_group.eks_node_grp.node_group_id
+    value = aws_eks_node_group.eks_node_grp[*].id
   
 }
 

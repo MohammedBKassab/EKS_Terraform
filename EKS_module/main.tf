@@ -19,17 +19,17 @@ resource "aws_eks_cluster" "eks_cluster" {
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids         = aws_subnet.eks_subnet[*].id
-    security_group_ids = [aws_security_group.eks_cluster_sg.id]
+    subnet_ids         = var.subnet_ids
+    security_group_ids = [var.cluster_security_group_id]
   }
 
 }
 
 resource "aws_eks_node_group" "eks_node_grp" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
-  node_group_name = var.nodes_name[count.index]
+  node_group_name = "eks-node-group"
   node_role_arn   = aws_iam_role.eks_node_group_role.arn
-  subnet_ids      = aws_subnet.eks_subnet[*].id
+  subnet_ids      = var.subnet_ids
 
   scaling_config {
     desired_size = 2
@@ -41,7 +41,7 @@ resource "aws_eks_node_group" "eks_node_grp" {
 
   remote_access {
     ec2_ssh_key = var.eks_key_name
-    source_security_group_ids = [aws_security_group.eks_node_sg.id]
+    source_security_group_ids = [var.node_security_group_id]
   }
 
 }
