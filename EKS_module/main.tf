@@ -1,4 +1,3 @@
-#creating a key pair for the cluster
 resource "aws_key_pair" "eks_key" {
   key_name   = var.eks_key_name
   public_key = tls_private_key.ec2_key.public_key_openssh
@@ -10,12 +9,10 @@ resource "tls_private_key" "ec2_key" {
 }
 
 resource "local_file" "private_key" {
-  content  = tls_private_key.ec2_key.private_key_pem
-  filename = "./${var.eks_key_name}.pem"
-  file_permission = "0400"
+  content          = tls_private_key.ec2_key.private_key_pem
+  filename         = "./${var.eks_key_name}.pem"
+  file_permission  = "0400"
 }
-
-
 
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
@@ -25,6 +22,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     subnet_ids         = aws_subnet.eks_subnet[*].id
     security_group_ids = [aws_security_group.eks_cluster_sg.id]
   }
+
 }
 
 resource "aws_eks_node_group" "eks_node_grp" {
@@ -45,6 +43,7 @@ resource "aws_eks_node_group" "eks_node_grp" {
     ec2_ssh_key = var.eks_key_name
     source_security_group_ids = [aws_security_group.eks_node_sg.id]
   }
+
 }
 
 resource "aws_iam_role" "eks_cluster_role" {
@@ -67,7 +66,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_role_policy" {
-  role       = aws_iam_role.cluster_role.name
+  role       = aws_iam_role.eks_cluster_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
@@ -95,12 +94,12 @@ resource "aws_iam_role_policy_attachment" "node_group_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
-resource "aws_iam_role_policy_attachment" "devopsshack_node_group_cni_policy" {
+resource "aws_iam_role_policy_attachment" "node_group_cni_policy" {
   role       = aws_iam_role.eks_node_group_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
-resource "aws_iam_role_policy_attachment" "devopsshack_node_group_registry_policy" {
+resource "aws_iam_role_policy_attachment" "node_group_registry_policy" {
   role       = aws_iam_role.eks_node_group_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }

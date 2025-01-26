@@ -18,3 +18,4 @@ output "node_group_ip" {
     value = aws_eks_node_group.eks_node_grp.node_group_id
   
 }
+
