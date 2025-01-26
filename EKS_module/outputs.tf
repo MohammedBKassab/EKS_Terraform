@@ -1,5 +1,6 @@
 output "private_key_filename" {
   description = "The filename of the generated private key"
+  sensitive = true
   value       = local_file.private_key.filename
 }
 

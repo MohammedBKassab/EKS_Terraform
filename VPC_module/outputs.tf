@@ -9,3 +9,4 @@ output "subnet_cidr_blocks" {
 output "subnet_map_public_ip_on_launch" {
   value = aws_subnet.eks_subnet[*].map_public_ip_on_launch
 }
+
