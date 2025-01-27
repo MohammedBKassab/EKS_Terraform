@@ -18,7 +18,3 @@ output "eks_cluster_endpoint" {
   value       = module.EKS.cluster_endpoint
 }
 
-# output "eks_node_group_ips" {
-#   description = "List of node group IPs"
-#   value       = module.EKS.node_group_ips
-# }
