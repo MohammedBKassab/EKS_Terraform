@@ -15,10 +15,10 @@ resource "aws_subnet" "eks_subnet" {
   vpc_id                  = aws_vpc.eks_vpc.id
   cidr_block              = cidrsubnet(aws_vpc.eks_vpc.cidr_block, 8, count.index)
   availability_zone       = element(var.availability_zones, count.index)
-  map_public_ip_on_launch = count.index < 2 ? true : false
+  map_public_ip_on_launch = true
 
   tags = {
-    Name = "${count.index < 2 ? "public ${count.index}" : "private ${count.index}"}-subnet"
+    Name =  "public ${count.index} -subnet"
   }
 }
 
